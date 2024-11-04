@@ -21,3 +21,19 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+# Arquivos de configuração do IDE
+.vscode/
+
+# Arquivos de configuração do STS
+.springBeans
+
+# Diretórios do IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Diretórios do Eclipse
+.classpath
+.project
+.settings/
