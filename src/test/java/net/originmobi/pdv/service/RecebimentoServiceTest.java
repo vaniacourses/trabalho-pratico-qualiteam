@@ -65,7 +65,6 @@ public void testAbrirRecebimento_jaquitado() {
     when(parcelaMock.getQuitado()).thenReturn(1);
     when(parcelaMock.getCodigo()).thenReturn(1L);
 
-//Teste se a parcela ja ta paga
     exception = assertThrows(RuntimeException.class, () -> {
     recebimentoService.abrirRecebimento(codpes1, arrayParcelas1);
     });
@@ -118,7 +117,6 @@ public void testAbrirRecebimento_ClienteNãoEncontrado() {
     });
     assertEquals("Cliente não encontrado", exception.getMessage());
 }
-    // Add more test cases as needed for other methods in RecebimentoService
 
 
 @Test
@@ -145,6 +143,5 @@ public void testAbrirRecebimento_() {
     when(recebimentosMock.save(recebimentoMock)).thenReturn(recebimentoMock);
     assertEquals(codpes.toString(), recebimentoService.abrirRecebimento(codpes, arrayParcelas));
 }
-    // Add more test cases as needed for other methods in RecebimentoService
 
 }
