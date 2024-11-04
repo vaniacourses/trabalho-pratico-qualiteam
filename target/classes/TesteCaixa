@@ -1,0 +1,126 @@
+// Importação de dependências do jQuery
+const $ = require('jquery');
+global.$ = global.jQuery = $;
+
+// Mock do arquivo que contém as funções que estamos testando
+require('./caminho/para/o/seu/arquivo');  // Altere para o caminho correto do seu arquivo
+
+describe("Teste de funcionalidades da tela de caixa", () => {
+
+  beforeEach(() => {
+    // Limpa o DOM antes de cada teste para evitar interferências
+    document.body.innerHTML = `
+      <input id="dataFechamantoCaixa" value="" />
+      <button id="btnSuprimento"></button>
+      <button id="btnSangria"></button>
+      <button id="btnTransferencia"></button>
+      <button id="btnfechacaixa"></button>
+      <div class="carrega"></div>
+      <div id="secGerenciar">
+        <button class="btn-suprimento-caixa" data-codcaixa="123"></button>
+        <button class="btn-Sangria-Sangria" data-codcaixa="123"></button>
+      </div>
+      <button class="btn-abrir-caixa" href="/abrir"></button>
+      <button class="btn-fechar-caixa" data-codcaixa="123" href="/fechar"></button>
+      <input id="admsenha" value="senha123" />
+      <select id="caixatipo">
+        <option value="BANCO">BANCO</option>
+      </select>
+      <div class="conta-banco-info"></div>
+      <form id="form_caixa"></form>
+    `;
+  });
+
+  test("Habilitação/Desabilitação dos botões com base no valor de dataFechamantoCaixa", () => {
+    $('#dataFechamantoCaixa').val("");
+    require('./caminho/para/o/seu/arquivo');  // Recarrega o script após setar valores
+
+    expect($("#btnSuprimento").prop("disabled")).toBe(false);
+    expect($("#btnSangria").prop("disabled")).toBe(false);
+    expect($("#btnTransferencia").prop("disabled")).toBe(false);
+    expect($("#btnfechacaixa").prop("disabled")).toBe(false);
+
+    $('#dataFechamantoCaixa').val("2023-11-01");
+    require('./caminho/para/o/seu/arquivo');
+
+    expect($("#btnSuprimento").prop("disabled")).toBe(true);
+    expect($("#btnSangria").prop("disabled")).toBe(true);
+    expect($("#btnTransferencia").prop("disabled")).toBe(true);
+    expect($("#btnfechacaixa").prop("disabled")).toBe(true);
+  });
+
+  test("Limpeza dos inputs no modal de suprimento e sangria", () => {
+    $("input[name='valor']").val("100");
+    $("input[name='observacao']").val("Observação de teste");
+
+    $('#btnSuprimento').trigger('click');
+    expect($("input[name='valor']").val()).toBe("");
+    expect($("input[name='observacao']").val()).toBe("");
+
+    $('#btnSangria').trigger('click');
+    expect($("input[name='valor']").val()).toBe("");
+    expect($("input[name='observacao']").val()).toBe("");
+  });
+
+  test("Abertura de caixa ao clicar no botão", async () => {
+    $.ajax = jest.fn().mockImplementation((options) => {
+      options.success("{Location=[/caixaAberto]}");
+    });
+
+    $('.btn-abrir-caixa').trigger('click');
+    expect($.ajax).toHaveBeenCalledWith(expect.objectContaining({
+      url: '/abrir',
+      type: 'post',
+    }));
+  });
+
+  test("Suprimento de caixa", async () => {
+    $.ajax = jest.fn().mockImplementation((options) => {
+      options.success("Suprimento realizado");
+    });
+
+    $('#idvalor').val("100");
+    $('#idObs').val("Observação");
+    $('.btn-suprimento-caixa').trigger('click');
+    expect($.ajax).toHaveBeenCalledWith(expect.objectContaining({
+      url: expect.stringContaining("?caixa=123&valor=100.00&obs=Observação"),
+      type: 'POST',
+    }));
+  });
+
+  test("Sangria de caixa", async () => {
+    $.ajax = jest.fn().mockImplementation((options) => {
+      options.success("Sangria realizada");
+    });
+
+    $('#idvl').val("50");
+    $('#idobs').val("Observação");
+    $('.btn-Sangria-Sangria').trigger('click');
+    expect($.ajax).toHaveBeenCalledWith(expect.objectContaining({
+      url: expect.stringContaining("?caixa=123&valor=50.00&obs=Observação"),
+      type: 'POST',
+    }));
+  });
+
+  test("Fechamento de caixa", async () => {
+    $.ajax = jest.fn().mockImplementation((options) => {
+      options.success("Caixa fechado com sucesso");
+    });
+
+    $('.btn-fechar-caixa').trigger('click');
+    expect($.ajax).toHaveBeenCalledWith(expect.objectContaining({
+      url: expect.stringContaining("?caixa=123&senha=senha123"),
+      type: 'post',
+    }));
+    expect($("#btnSuprimento").prop("disabled")).toBe(true);
+    expect($("#btnSangria").prop("disabled")).toBe(true);
+    expect($("#btnTransferencia").prop("disabled")).toBe(true);
+    expect($("#btnfechacaixa").prop("disabled")).toBe(true);
+  });
+
+  test("Adição de inputs de agência e conta quando o tipo BANCO é selecionado", () => {
+    $('#caixatipo').val('BANCO').trigger('change');
+    expect($('.conta-banco-info').html()).toContain("Agência");
+    expect($('.conta-banco-info').html()).toContain("Conta");
+  });
+});
