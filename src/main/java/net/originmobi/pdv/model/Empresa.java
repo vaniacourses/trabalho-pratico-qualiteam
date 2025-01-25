@@ -2,8 +2,14 @@ package net.originmobi.pdv.model;
 
 import java.io.Serializable;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.br.CNPJ;
 

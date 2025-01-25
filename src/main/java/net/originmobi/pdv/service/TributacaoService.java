@@ -28,7 +28,7 @@ public class TributacaoService {
 
 		Optional<Empresa> empresa = empresas.verificaEmpresaCadastrada();
 
-		if (empresa.isEmpty())
+		if (!empresa.isPresent())
 			return "sem empresa";
 
 		try {

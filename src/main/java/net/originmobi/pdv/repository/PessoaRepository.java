@@ -12,6 +12,6 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
 
 	public List<Pessoa> findByNomeContaining(String nome);
 
-	public Pessoa findByCodigo(Long codigo);
+	public Pessoa findByCodigoIn(Long codigo);
 
 }

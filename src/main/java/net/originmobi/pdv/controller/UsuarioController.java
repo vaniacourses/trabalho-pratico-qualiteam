@@ -7,7 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -74,7 +81,7 @@ public class UsuarioController {
 		return mv;
 	}
 
-	@PostMapping("/addgrupo")
+	@RequestMapping(value = "/addgrupo", method = RequestMethod.POST)
 	public @ResponseBody String addGrupo(@RequestParam Map<String, String> request) {
 
 		if (request.get("codigoGru").length() == 0)
@@ -86,7 +93,7 @@ public class UsuarioController {
 		return usuarios.addGrupo(codUsu, codGru);
 	}
 
-	@PutMapping("/removegrupo")
+	@RequestMapping(value = "/removegrupo", method = RequestMethod.PUT)
 	public @ResponseBody String removeGrupo(@RequestParam Map<String, String> request) {
 		Long codUsu = Long.decode(request.get("codigoUsu"));
 		Long codGru = Long.decode(request.get("codigoGru"));

@@ -1,163 +1,262 @@
 package net.originmobi.pdv.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import net.originmobi.pdv.model.GrupoUsuario;
 import net.originmobi.pdv.model.Usuario;
 import net.originmobi.pdv.repository.GrupoUsuarioRepository;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-class GrupoUsuarioServiceTest {
+import java.util.Arrays;
+import java.util.List;
 
-    @Mock
-    private GrupoUsuarioRepository grupoUsuarioRepository;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+@RunWith(MockitoJUnitRunner.class)
+public class GrupoUsuarioServiceTest {
 
     @InjectMocks
     private GrupoUsuarioService grupoUsuarioService;
 
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.openMocks(this);
+    @Mock
+    private GrupoUsuarioRepository grupousuarios;
+
+    @Mock
+    private RedirectAttributes redirectAttributes;
+
+    private Usuario usuario;
+    private GrupoUsuario grupoUsuario;
+
+    @Before
+    public void setUp() {
+        usuario = new Usuario();
+        usuario.setCodigo(1L);
+        usuario.setUser("usuarioTeste");
+
+        grupoUsuario = new GrupoUsuario();
+        grupoUsuario.setCodigo(1L);
+        grupoUsuario.setNome("Grupo Teste");
+        grupoUsuario.setDescricao("Descrição do Grupo Teste");
     }
 
+    // Teste para o método buscaGrupos(Usuario usuario) -ok
     @Test
-    void testBuscaGrupos() {
-        List<GrupoUsuario> grupos = new ArrayList<>();
-        Usuario usuario = new Usuario();
-        when(grupoUsuarioRepository.findByUsuario(any(Usuario.class))).thenReturn(grupos);
+    public void testBuscaGrupos() {
+        // Dados simulados
+        GrupoUsuario grupo1 = new GrupoUsuario();
+        grupo1.setCodigo(1L);
+        grupo1.setNome("Grupo 1");
+        grupo1.setDescricao("Descrição do Grupo 1");
 
-        List<GrupoUsuario> found = grupoUsuarioService.buscaGrupos(usuario);
+        GrupoUsuario grupo2 = new GrupoUsuario();
+        grupo2.setCodigo(2L);
+        grupo2.setNome("Grupo 2");
+        grupo2.setDescricao("Descrição do Grupo 2");
 
-        assertNotNull(found);
-        assertEquals(grupos, found);
-        verify(grupoUsuarioRepository, times(1)).findByUsuario(any(Usuario.class));
+        List<GrupoUsuario> gruposEsperados = Arrays.asList(grupo1, grupo2);
+
+        // Configuração do mock
+        when(grupousuarios.findByUsuarioIn(usuario)).thenReturn(gruposEsperados);
+
+        // Execução do método a ser testado
+        List<GrupoUsuario> gruposRetornados = grupoUsuarioService.buscaGrupos(usuario);
+
+        // Verificações
+        assertEquals(2, gruposRetornados.size());
+        assertEquals("Grupo 1", gruposRetornados.get(0).getNome());
+        assertEquals("Grupo 2", gruposRetornados.get(1).getNome());
     }
 
+    // Teste para o método lista() -ok
     @Test
-    void testLista() {
-        List<GrupoUsuario> grupos = new ArrayList<>();
-        when(grupoUsuarioRepository.findAll()).thenReturn(grupos);
+    public void testLista() {
+        // Dados simulados
+        GrupoUsuario grupo1 = new GrupoUsuario();
+        grupo1.setCodigo(1L);
+        grupo1.setNome("Grupo 1");
 
-        List<GrupoUsuario> found = grupoUsuarioService.lista();
+        GrupoUsuario grupo2 = new GrupoUsuario();
+        grupo2.setCodigo(2L);
+        grupo2.setNome("Grupo 2");
 
-        assertNotNull(found);
-        assertEquals(grupos, found);
-        verify(grupoUsuarioRepository, times(1)).findAll();
+        List<GrupoUsuario> gruposEsperados = Arrays.asList(grupo1, grupo2);
+
+        // Configuração do mock
+        when(grupousuarios.findAll()).thenReturn(gruposEsperados);
+
+        // Execução do método
+        List<GrupoUsuario> gruposRetornados = grupoUsuarioService.lista();
+
+        // Verificações
+        assertEquals(2, gruposRetornados.size());
+        verify(grupousuarios, times(1)).findAll();
     }
 
+    // Teste para o método buscaGrupo(Long codigoGru) -ok
     @Test
-    void testBuscaGrupo() {
-        GrupoUsuario grupo = new GrupoUsuario();
-        when(grupoUsuarioRepository.findByCodigo(anyLong())).thenReturn(grupo);
+    public void testBuscaGrupo() {
+        Long codigoGru = 1L;
 
-        GrupoUsuario found = grupoUsuarioService.buscaGrupo(1L);
+        // Configuração do mock
+        when(grupousuarios.findByCodigoIn(codigoGru)).thenReturn(grupoUsuario);
 
-        assertNotNull(found);
-        assertEquals(grupo, found);
-        verify(grupoUsuarioRepository, times(1)).findByCodigo(anyLong());
+        // Execução do método
+        GrupoUsuario grupoRetornado = grupoUsuarioService.buscaGrupo(codigoGru);
+
+        // Verificações
+        assertNotNull(grupoRetornado);
+        assertEquals("Grupo Teste", grupoRetornado.getNome());
+        verify(grupousuarios, times(1)).findByCodigoIn(codigoGru);
     }
 
+    // Teste para o método merge(GrupoUsuario grupoUsuario, RedirectAttributes attributes) -ok
     @Test
-    void testMergeNovoGrupo() {
-        RedirectAttributes attributes = mock(RedirectAttributes.class);
-        GrupoUsuario grupo = new GrupoUsuario();
+    public void testMergeNovoGrupo() {
+        // Dados de entrada
+        GrupoUsuario novoGrupo = new GrupoUsuario();
+        novoGrupo.setNome("Novo Grupo");
+        novoGrupo.setDescricao("Descrição do Novo Grupo");
 
-        grupoUsuarioService.merge(grupo, attributes);
+        // Configuração do mock
+        when(grupousuarios.save(novoGrupo)).thenReturn(novoGrupo);
 
-        verify(grupoUsuarioRepository, times(1)).save(any(GrupoUsuario.class));
-        verify(attributes, times(1)).addFlashAttribute("mensagem", "Grupo adicionado com sucesso");
+        // Execução do método
+        grupoUsuarioService.merge(novoGrupo, redirectAttributes);
+
+        // Verificações
+        verify(grupousuarios, times(1)).save(novoGrupo);
+        verify(redirectAttributes, times(1)).addFlashAttribute("mensagem", "Grupo adicionado com sucesso");
     }
 
+
+    // Teste que atualiza a descrição do grupo
     @Test
-    void testMergeGrupoExistente() {
-        RedirectAttributes attributes = mock(RedirectAttributes.class);
-        GrupoUsuario grupo = new GrupoUsuario();
-        grupo.setCodigo(1L);
-        grupo.setNome("Nome do Grupo");
-        grupo.setDescricao("Descrição do Grupo");
+    public void testMergeAtualizaGrupo() {
+        // Dados de entrada
+        GrupoUsuario grupoExistente = new GrupoUsuario();
+        grupoExistente.setCodigo(1L);
+        grupoExistente.setNome("Grupo Atualizado");
+        grupoExistente.setDescricao("Descrição Atualizada");
 
-        grupoUsuarioService.merge(grupo, attributes);
+        // Não é necessário configurar o mock para métodos void
 
-        verify(grupoUsuarioRepository, times(1)).update(eq("Nome do Grupo"), eq("Descrição do Grupo"), eq(1L));
-        verify(attributes, times(1)).addFlashAttribute("mensagem", "Grupo atualizado com sucesso");
+        // Execução do método
+        grupoUsuarioService.merge(grupoExistente, redirectAttributes);
+
+        // Verificações
+        verify(grupousuarios, times(1)).update(
+                grupoExistente.getNome(),
+                grupoExistente.getDescricao(),
+                grupoExistente.getCodigo()
+        );
+        verify(redirectAttributes, times(1)).addFlashAttribute("mensagem", "Grupo atualizado com sucesso");
     }
 
+    // remove grupo sem usuário -ok
+    // Teste para o método remove(Long codigo, RedirectAttributes attributes)
     @Test
-    void testRemoveGrupoComUsuarios() {
-        RedirectAttributes attributes = mock(RedirectAttributes.class);
-        when(grupoUsuarioRepository.grupoTemUsuaio(anyLong())).thenReturn(1);
+    public void testRemoveGrupoSemUsuariosVinculados() {
+        Long codigoGrupo = 1L;
 
-        String result = grupoUsuarioService.remove(1L, attributes);
+        // Configuração do mock
+        when(grupousuarios.grupoTemUsuaio(codigoGrupo)).thenReturn(0);
+        // Não é necessário configurar o mock para deleteById
 
-        assertEquals("redirect:/grupousuario/1", result);
-        verify(attributes, times(1)).addFlashAttribute("mensagemErro", "Este grupo possue usuários vinculados a ele, verifique");
-        verify(grupoUsuarioRepository, never()).deleteById(anyLong());
+        // Execução do método
+        String resultado = grupoUsuarioService.remove(codigoGrupo, redirectAttributes);
+
+        // Verificações
+        verify(grupousuarios, times(1)).deleteById(codigoGrupo);
+        assertEquals("redirect:/grupousuario", resultado);
     }
 
+    // apagar grupo com usuários associados
     @Test
-    void testRemoveGrupoSemUsuarios() {
-        RedirectAttributes attributes = mock(RedirectAttributes.class);
-        when(grupoUsuarioRepository.grupoTemUsuaio(anyLong())).thenReturn(0);
+    public void testRemoveGrupoComUsuariosVinculados() {
+        Long codigoGrupo = 1L;
 
-        String result = grupoUsuarioService.remove(1L, attributes);
+        // Configuração do mock
+        when(grupousuarios.grupoTemUsuaio(codigoGrupo)).thenReturn(1);
 
-        assertEquals("redirect:/grupousuario", result);
-        verify(grupoUsuarioRepository, times(1)).deleteById(anyLong());
+        // Execução do método
+        String resultado = grupoUsuarioService.remove(codigoGrupo, redirectAttributes);
+
+        // Verificações
+        verify(grupousuarios, never()).deleteById(codigoGrupo);
+        verify(redirectAttributes, times(1))
+                .addFlashAttribute(eq("mensagemErro"), eq("Este grupo possue usuários vinculados a ele, verifique"));
+        assertEquals("redirect:/grupousuario/" + codigoGrupo, resultado);
     }
 
+    // Teste para o método addPermissao(Long codgrupo, Long codpermissao) -ok
     @Test
-    void testAddPermissao() {
-        when(grupoUsuarioRepository.grupoTemPermissao(anyLong(), anyLong())).thenReturn(0);
+    public void testAddPermissaoComSucesso() {
+        Long codgrupo = 1L;
+        Long codpermissao = 2L;
 
-        String result = grupoUsuarioService.addPermissao(1L, 1L);
+        // Configuração do mock
+        when(grupousuarios.grupoTemPermissao(codgrupo, codpermissao)).thenReturn(0);
+        // Não é necessário configurar o mock para addPermissao
 
-        assertEquals("Permissao adicionada com sucesso", result);
-        verify(grupoUsuarioRepository, times(1)).addPermissao(anyLong(), anyLong());
+        // Execução do método
+        String resultado = grupoUsuarioService.addPermissao(codgrupo, codpermissao);
+
+        // Verificações
+        verify(grupousuarios, times(1)).addPermissao(codgrupo, codpermissao);
+        assertEquals("Permissao adicionada com sucesso", resultado);
     }
 
+    // adicionar permissão que ja existe
+    @Test(expected = RuntimeException.class)
+    public void testAddPermissaoJaExiste() {
+        Long codgrupo = 1L;
+        Long codpermissao = 2L;
+
+        // Configuração do mock
+        when(grupousuarios.grupoTemPermissao(codgrupo, codpermissao)).thenReturn(1);
+
+        // Execução do método que deve lançar exceção
+        grupoUsuarioService.addPermissao(codgrupo, codpermissao);
+
+        // Verificações
+        verify(grupousuarios, never()).addPermissao(anyLong(), anyLong());
+    }
+
+    // Teste para o método removePermissao(Long codigo, Long codgrupo)
     @Test
-    void testAddPermissaoExistente() {
-        when(grupoUsuarioRepository.grupoTemPermissao(anyLong(), anyLong())).thenReturn(1);
+    public void testRemovePermissaoComSucesso() {
+        Long codigoPermissao = 1L;
+        Long codgrupo = 1L;
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            grupoUsuarioService.addPermissao(1L, 1L);
-        });
+        // Não é necessário configurar o mock para métodos void
 
-        assertEquals("Esta permissão já esta adicionada a este grupo", exception.getMessage());
-        verify(grupoUsuarioRepository, never()).addPermissao(anyLong(), anyLong());
+        // Execução do método
+        String resultado = grupoUsuarioService.removePermissao(codigoPermissao, codgrupo);
+
+        // Verificações
+        verify(grupousuarios, times(1)).removePermissao(codigoPermissao, codgrupo);
+        assertEquals("Permissão removida com sucesso", resultado);
     }
 
-    @Test
-    void testRemovePermissao() {
-        String result = grupoUsuarioService.removePermissao(1L, 1L);
+    @Test(expected = RuntimeException.class)
+    public void testRemovePermissaoComErro() {
+        Long codigoPermissao = 1L;
+        Long codgrupo = 1L;
 
-        assertEquals("Permissão removida com sucesso", result);
-        verify(grupoUsuarioRepository, times(1)).removePermissao(anyLong(), anyLong());
-    }
+        // Configuração do mock para lançar exceção
+        doThrow(new RuntimeException("Erro ao tentar remover permissão, chame o suporte"))
+                .when(grupousuarios).removePermissao(codigoPermissao, codgrupo);
 
-    @Test
-    void testRemovePermissaoErro() {
-        doThrow(new RuntimeException("Erro ao tentar remover permissão, chame o suporte")).when(grupoUsuarioRepository).removePermissao(anyLong(), anyLong());
+        // Execução do método que deve lançar exceção
+        grupoUsuarioService.removePermissao(codigoPermissao, codgrupo);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            grupoUsuarioService.removePermissao(1L, 1L);
-        });
-
-        assertEquals("Erro ao tentar remover permissão, chame o suporte", exception.getMessage());
-        verify(grupoUsuarioRepository, times(1)).removePermissao(anyLong(), anyLong());
-    }
+        // Verificações
+        verify(grupousuarios, times(1)).removePermissao(codigoPermissao, codgrupo);
+}
 }

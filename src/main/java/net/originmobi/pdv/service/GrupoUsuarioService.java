@@ -17,7 +17,7 @@ public class GrupoUsuarioService {
 	private GrupoUsuarioRepository grupousuarios;
 
 	public List<GrupoUsuario> buscaGrupos(Usuario usuario) {
-		return grupousuarios.findByUsuario(usuario);
+		return grupousuarios.findByUsuarioIn(usuario);
 	}
 
 	public List<GrupoUsuario> lista() {
@@ -25,7 +25,7 @@ public class GrupoUsuarioService {
 	}
 
 	public GrupoUsuario buscaGrupo(Long codigoGru) {
-		return grupousuarios.findByCodigo(codigoGru);
+		return grupousuarios.findByCodigoIn(codigoGru);
 	}
 
 	public void merge(GrupoUsuario grupoUsuario, RedirectAttributes attributes) {

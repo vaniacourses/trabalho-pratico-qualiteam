@@ -3,8 +3,13 @@ package net.originmobi.pdv.model;
 import java.io.Serializable;
 import java.sql.Date;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "pagamento_tipo")

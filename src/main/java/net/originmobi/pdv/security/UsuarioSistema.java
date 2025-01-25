@@ -1,11 +1,12 @@
 package net.originmobi.pdv.security;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-public class UsuarioSistema extends User {
+public class UsuarioSistema extends User implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

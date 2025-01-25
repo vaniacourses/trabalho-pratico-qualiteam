@@ -6,6 +6,6 @@ import net.originmobi.pdv.model.Telefone;
 
 public interface TelefoneRepository extends JpaRepository<Telefone, Long>{
 	
-	public Telefone findByCodigo(long codigo);
+	public Telefone findByCodigoIn(long codigo);
 
 }

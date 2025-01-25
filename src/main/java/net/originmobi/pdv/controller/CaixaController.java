@@ -8,7 +8,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -58,7 +64,7 @@ public class CaixaController {
 		return mv;
 	}
 
-	@PostMapping
+	@RequestMapping(method = RequestMethod.POST)
 	public @ResponseBody String cadastro(@RequestParam Map<String, String> request, UriComponentsBuilder b) {
 		String descricao = request.get("descricao");
 		String tipo = request.get("tipo");
@@ -96,7 +102,7 @@ public class CaixaController {
 		return mv;
 	}
 
-	@PostMapping("/lancamento/suprimento")
+	@RequestMapping(value = "/lancamento/suprimento", method = RequestMethod.POST)
 	public @ResponseBody String fazSuprimento(@RequestParam Map<String, String> request) {
 		Double valor = Double.valueOf(request.get("valor").replace(",", "."));
 		String observacao = request.get("obs");
@@ -120,7 +126,7 @@ public class CaixaController {
 		return retorno;
 	}
 
-	@PostMapping("/lancamento/sangria")
+	@RequestMapping(value = "/lancamento/sangria", method = RequestMethod.POST)
 	public @ResponseBody String fazSangria(@RequestParam Map<String, String> request) {
 		Double valor = Double.valueOf(request.get("valor").replace(",", "."));
 		String observacao = request.get("obs");
@@ -143,7 +149,7 @@ public class CaixaController {
 		return retorno;
 	}
 
-	@PostMapping("/fechar")
+	@RequestMapping(value = "/fechar", method = RequestMethod.POST)
 	public @ResponseBody String fecha(@RequestParam Map<String, String> request) {
 		Long caixa = Long.decode(request.get("caixa"));
 		String senha = request.get("senha");

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import net.originmobi.pdv.utilitarios.ConexaoJDBC;

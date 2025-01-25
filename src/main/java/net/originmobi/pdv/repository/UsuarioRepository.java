@@ -12,6 +12,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
 	public Usuario findByUserContaining(String usuario);
 
-	public Usuario findByCodigo(Long codigo);
+	public Usuario findByCodigoIn(Long codigo);
 	
 }
