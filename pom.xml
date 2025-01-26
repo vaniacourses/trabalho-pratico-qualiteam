@@ -120,6 +120,12 @@
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		  <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-inline</artifactId>
+        <version>4.11.0</version>
+        <scope>test</scope>
+    </dependency>
 		<!-- … -->
 	</dependencies>
 

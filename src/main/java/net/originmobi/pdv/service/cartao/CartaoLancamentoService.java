@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import net.originmobi.pdv.enumerado.TituloTipo;
+import net.originmobi.pdv.enumerado.TituloTipoEnum;
 import net.originmobi.pdv.enumerado.caixa.EstiloLancamento;
 import net.originmobi.pdv.enumerado.caixa.TipoLancamento;
 import net.originmobi.pdv.enumerado.cartao.CartaoSituacao;
@@ -55,12 +55,12 @@ public class CartaoLancamentoService {
 		int dias = 0;
 
 		// verifica se é debito ou crédito e pega os valores corretos do titulo
-		if (titulo.get().getTipo().getSigla().equals(TituloTipo.CARTDEB.toString())) {
+		if (titulo.get().getTipo().getSigla().equals(TituloTipoEnum.CARTDEB.toString())) {
 			taxa = titulo.get().getMaquina().getTaxa_debito();
 			dias = titulo.get().getMaquina().getDias_debito();
 			tipo = CartaoTipo.DEBITO;
 
-		} else if (titulo.get().getTipo().getSigla().equals(TituloTipo.CARTCRED.toString())) {
+		} else if (titulo.get().getTipo().getSigla().equals(TituloTipoEnum.CARTCRED.toString())) {
 			taxa = titulo.get().getMaquina().getTaxa_credito();
 			dias = titulo.get().getMaquina().getDias_credito();
 			tipo = CartaoTipo.CREDITO;

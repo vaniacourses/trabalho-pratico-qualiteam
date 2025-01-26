@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import net.originmobi.pdv.enumerado.EntradaSaida;
-import net.originmobi.pdv.enumerado.TituloTipo;
+import net.originmobi.pdv.enumerado.TituloTipoEnum;
 import net.originmobi.pdv.enumerado.VendaSituacao;
 import net.originmobi.pdv.enumerado.caixa.EstiloLancamento;
 import net.originmobi.pdv.enumerado.caixa.TipoLancamento;
@@ -204,7 +204,7 @@ public class VendaService {
 			if (formaPagar[i].equals("00")) {
 
 				// no dinheiro
-				if (titulo.get().getTipo().getSigla().equals(TituloTipo.DIN.toString())) {
+				if (titulo.get().getTipo().getSigla().equals(TituloTipoEnum.DIN.toString())) {
 					// verifica se o caixa esta aberto para realizar o lançamento no mesmo
 					if (!caixas.caixaIsAberto())
 						throw new RuntimeException("nenhum caixa aberto");
@@ -213,8 +213,8 @@ public class VendaService {
 				}
 
 				// se for no cartão de debito ou crédito
-				else if (titulo.get().getTipo().getSigla().equals(TituloTipo.CARTDEB.toString())
-						|| titulo.get().getTipo().getSigla().equals(TituloTipo.CARTCRED.toString())) {
+				else if (titulo.get().getTipo().getSigla().equals(TituloTipoEnum.CARTDEB.toString())
+						|| titulo.get().getTipo().getSigla().equals(TituloTipoEnum.CARTCRED.toString())) {
 
 					Double vl_parcela = Double.valueOf(vlParcelas[i]);
 
@@ -268,8 +268,8 @@ public class VendaService {
 					Date.valueOf(dataAtual.DataAtualIncrementa(Integer.parseInt(formaPagar[i]))));
 
 		} catch (Exception e) {
-			e.getMessage();
-			throw new RuntimeException();
+		    e.printStackTrace(); // Adicione isso para entender o problema real
+		    throw new RuntimeException(e.getMessage(), e);
 		}
 
 		sequencia++;
