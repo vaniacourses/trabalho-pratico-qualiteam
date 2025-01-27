@@ -8,7 +8,8 @@ public class Aplicacao {
 	private String usuarioAtual;
 
 	public Aplicacao() {
-		usuarioAtual = SecurityContextHolder.getContext().getAuthentication().getName();
+		usuarioAtual = "Usuario Teste";
+				//SecurityContextHolder.getContext().getAuthentication().getName();
 	}
 
 	public static synchronized Aplicacao getInstancia() {
