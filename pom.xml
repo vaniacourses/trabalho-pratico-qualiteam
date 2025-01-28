@@ -168,10 +168,10 @@
             <outputFormat>HTML</outputFormat>
           </outputFormats>
           <targetClasses>
-            <param>com.rdelgatte.pitest.*</param>
+            <param><param>net.originmobi.pdv.*</param></param>
           </targetClasses>
           <targetTests>
-            <param>com.rdelgatte.pitest.*</param>
+            <param><param>net.originmobi.pdv.*</param></param>
           </targetTests>
           <exportLineCoverage>true</exportLineCoverage>
           <!--We want each report to override the former one-->
