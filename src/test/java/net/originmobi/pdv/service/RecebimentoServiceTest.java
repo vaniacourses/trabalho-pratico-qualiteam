@@ -39,9 +39,7 @@ public class RecebimentoServiceTest {
     private RecebimentoService recebimentoService;
 
     @Mock
-    private RecebimentoParcelaService receParcelas;
-    @Mock
-    private RecebimentoRepository recebimentoRepository;
+    private RecebimentoRepository recebimentos;
 
     @Mock
     private PessoaService pessoas;
@@ -65,7 +63,7 @@ public class RecebimentoServiceTest {
     private CaixaLancamentoService lancamentos;
 
     @Mock
-    private RecebimentoParcelaService recebimentos;
+    private RecebimentoParcelaService receParcelas;
     
     @Mock
     private Receber receberMock;
@@ -135,7 +133,7 @@ public void testAbrirRecebimento_Success() {
     // Mockando repositório
     Recebimento recebimentoMock = mock(Recebimento.class);
     when(recebimentoMock.getCodigo()).thenReturn(1L);
-    when(recebimentoRepository.save(any(Recebimento.class))).thenAnswer(invocation -> {
+    when(recebimentos.save(any(Recebimento.class))).thenAnswer(invocation -> {
         Recebimento r = invocation.getArgument(0);
         r.setCodigo(1L);
         return r;
@@ -148,7 +146,7 @@ public void testAbrirRecebimento_Success() {
     assertNotNull(codigoRecebimento);
     assertEquals("1", codigoRecebimento);
     verify(parcelas, times(2)).busca(anyLong());
-    verify(recebimentoRepository, times(1)).save(any(Recebimento.class));
+    verify(recebimentos, times(1)).save(any(Recebimento.class));
 }
 
     @Test
@@ -199,6 +197,7 @@ public void testAbrirRecebimento_Success() {
 
         // Verificação da mensagem
         assertEquals("A parcela " + parcela.getCodigo() + " não pertence ao cliente selecionado", exception.getMessage());
+        verify(parcela,times(1)).getQuitado();
     }
     @Test
     public void testAbrirRecebimento_ClienteNaoEncontrado() {
@@ -226,54 +225,7 @@ public void testAbrirRecebimento_Success() {
     }
     
     
-    @Test
-    public void testReceber_Success() {
-        // Dados de entrada
-        Long codreceber = 1L;
-        Double vlrecebido = 100.0;
-        Double vlacrescimo = 0.0;
-        Double vldesconto = 0.0;
-        Long codtitulo = 1L;
-
-        // Mocking do recebimento
-        Recebimento recebimento = mock(Recebimento.class);
-        when(recebimento.getData_processamento()).thenReturn(null);
-        when(recebimento.getValor_total()).thenReturn(100.0);
-        when(recebimentoRepository.findById(codreceber)).thenReturn(Optional.of(recebimento));
-
-        // Mocking do título
-        Titulo titulo = mock(Titulo.class);
-        when(titulo.getTipo()).thenReturn(tituloTipoMock);
-        when(titulos.busca(codtitulo)).thenReturn(Optional.of(titulo));
-
-        // Mocking das parcelas
-        List<Parcela> listParcelas = new ArrayList<>();
-        Parcela parcela = mock(Parcela.class);
-        when(parcela.getValor_restante()).thenReturn(100.0);
-        listParcelas.add(parcela);
-        when(recebimentos.parcelasDoReceber(codreceber)).thenReturn(listParcelas);
-
-        // Mocking do caixa
-        Caixa caixa = mock(Caixa.class);
-        when(caixas.caixaAberto()).thenReturn(Optional.of(caixa));
-
-        // Mocking do usuário
-        Usuario usuario = mock(Usuario.class);
-        when(usuarios.buscaUsuario(anyString())).thenReturn(usuario);
-        
-        when(tituloMock.getTipo()).thenReturn(tituloTipoMock);
-        when(tituloTipoMock.getSigla()).thenReturn("CARTDEB");
-        doNothing().when(cartaoLancamentos).lancamento(vlrecebido, Optional.of(titulo));
-
-
-        // Execução do método
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-        	recebimentoService.receber(codreceber, vlrecebido, vlacrescimo, vldesconto, codtitulo);
-        });
-        // Verificações
-        assertEquals("Recebimento não possue parcelas", exception.getMessage());
-    }
+    
     
     
 
@@ -306,7 +258,7 @@ public void testAbrirRecebimento_Success() {
         // Mocking do recebimento já fechado
         Recebimento recebimento = mock(Recebimento.class);
         when(recebimento.getData_processamento()).thenReturn(dataProcessamento);
-        when(recebimentoRepository.findById(codreceber)).thenReturn(Optional.of(recebimento));
+        when(recebimentos.findById(codreceber)).thenReturn(Optional.of(recebimento));
 
         // Execução do método
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
@@ -330,7 +282,7 @@ public void testAbrirRecebimento_Success() {
         when(titulos.busca(codtitulo)).thenReturn(Optional.of(tituloMock));
         when(recebimento.getData_processamento()).thenReturn(null);
         when(recebimento.getValor_total()).thenReturn(100.0);
-        when(recebimentoRepository.findById(codreceber)).thenReturn(Optional.of(recebimento));
+        when(recebimentos.findById(codreceber)).thenReturn(Optional.of(recebimento));
         doNothing().when(recebimento).setTitulo(tituloMock);
 
         // Execução do método
@@ -356,7 +308,7 @@ public void testAbrirRecebimento_Success() {
         when(titulos.busca(codtitulo)).thenReturn(Optional.of(tituloMock));
         when(recebimento.getData_processamento()).thenReturn(null);
         when(recebimento.getValor_total()).thenReturn(100.0);
-        when(recebimentoRepository.findById(codreceber)).thenReturn(Optional.of(recebimento));
+        when(recebimentos.findById(codreceber)).thenReturn(Optional.of(recebimento));
         doNothing().when(recebimento).setTitulo(tituloMock);
         when(receParcelas.parcelasDoReceber(codreceber)).thenReturn(listParcelaMock);
         
@@ -386,7 +338,7 @@ public void testAbrirRecebimento_Success() {
         when(titulos.busca(codtitulo)).thenReturn(Optional.of(tituloMock));
         when(recebimento.getData_processamento()).thenReturn(null);
         when(recebimento.getValor_total()).thenReturn(100.0);
-        when(recebimentoRepository.findById(codreceber)).thenReturn(Optional.of(recebimento));
+        when(recebimentos.findById(codreceber)).thenReturn(Optional.of(recebimento));
         doNothing().when(recebimento).setTitulo(tituloMock);
         when(receParcelas.parcelasDoReceber(codreceber)).thenReturn(listParcelaMock);
         
@@ -417,7 +369,7 @@ public void testAbrirRecebimento_Success() {
         when(titulos.busca(codtitulo)).thenReturn(Optional.of(tituloMock));
         when(recebimento.getData_processamento()).thenReturn(null);
         when(recebimento.getValor_total()).thenReturn(1000.0);
-        when(recebimentoRepository.findById(codreceber)).thenReturn(Optional.of(recebimento));
+        when(recebimentos.findById(codreceber)).thenReturn(Optional.of(recebimento));
         doNothing().when(recebimento).setTitulo(tituloMock);
         when(receParcelas.parcelasDoReceber(codreceber)).thenReturn(listParcelaMock);
         when(parcela2Mock.getValor_restante()).thenReturn(valorRestante1);
@@ -435,15 +387,89 @@ public void testAbrirRecebimento_Success() {
        // });
         	
         assertEquals("Recebimento realizado com sucesso", resultado);
+        verify(cartaoLancamentos, never()).lancamento(anyDouble(),any());
     }
+    
+    
+    
+    
+    @Test
+    public void testReceber_SucessoPassandoIfTipo5parcelas() {
+        // Dados de entrada
+    	Parcela parcelaMock1 = mock(Parcela.class);
+    	Parcela parcelaMock2 = mock(Parcela.class);
+    	Parcela parcelaMock3 = mock(Parcela.class);
+    	Parcela parcelaMock4 = mock(Parcela.class);
+    	Parcela parcelaMock5 = mock(Parcela.class);
+    	
+    	Double valorRestante = 1.00;
+        Long codreceber = 1L;
+        Double vlrecebido = 5.0;
+        Double vlacrescimo = 0.0;
+        Double vldesconto = 0.0;
+        Long codtitulo = 1L;
+        List<Parcela> listParcelaMock =  new ArrayList<>();
+        listParcelaMock.add(parcelaMock1);
+        listParcelaMock.add(parcelaMock2);
+        listParcelaMock.add(parcelaMock3);
+        listParcelaMock.add(parcelaMock4);
+        listParcelaMock.add(parcelaMock5);
+
+        // Mocking do recebimento
+        Recebimento recebimento = mock(Recebimento.class);
+        when(titulos.busca(codtitulo)).thenReturn(Optional.of(tituloMock));
+        when(recebimento.getData_processamento()).thenReturn(null);
+        when(recebimento.getValor_total()).thenReturn(10.00);
+        when(recebimentos.findById(codreceber)).thenReturn(Optional.of(recebimento));
+        doNothing().when(recebimento).setTitulo(tituloMock);
+        when(receParcelas.parcelasDoReceber(codreceber)).thenReturn(listParcelaMock);
+        when(parcelaMock1.getValor_restante()).thenReturn(valorRestante);
+        when(parcelaMock2.getValor_restante()).thenReturn(valorRestante);
+        when(parcelaMock3.getValor_restante()).thenReturn(valorRestante);
+        when(parcelaMock4.getValor_restante()).thenReturn(valorRestante);
+        when(parcelaMock5.getValor_restante()).thenReturn(valorRestante);
+        when(parcela2Mock.getCodigo()).thenReturn(1L);
+        when(parcela2Mock.getCodigo()).thenReturn(2L);
+        when(parcela2Mock.getCodigo()).thenReturn(3L);
+        when(parcela2Mock.getCodigo()).thenReturn(4L);
+        when(parcela2Mock.getCodigo()).thenReturn(5L);
+        when(parcelas.receber(eq(1L), anyDouble(), anyDouble(), anyDouble())).thenReturn("ok");
+        when(parcelas.receber(eq(2L), anyDouble(), anyDouble(), anyDouble())).thenReturn("ok");
+        when(parcelas.receber(eq(3L), anyDouble(), anyDouble(), anyDouble())).thenReturn("ok");
+        when(parcelas.receber(eq(4L), anyDouble(), anyDouble(), anyDouble())).thenReturn("ok");
+        when(parcelas.receber(eq(5L), anyDouble(), anyDouble(), anyDouble())).thenReturn("ok");
+        when(tituloMock.getTipo()).thenReturn(tituloTipoMock);
+        when(tituloTipoMock.getSigla()).thenReturn("CARTDEB");
+        when(caixas.caixaAberto()).thenReturn(Optional.of(caixaMock));
+        when(lancamentos.lancamento(any(CaixaLancamento.class))).thenReturn("ok");
+        // Execução do método
+        //RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        String resultado = recebimentoService.receber(codreceber, vlrecebido, vlacrescimo, vldesconto, codtitulo);
+       // });
+        	
+        assertEquals("Recebimento realizado com sucesso", resultado);
+        verify(cartaoLancamentos, times(1)).lancamento(anyDouble(),any());
+        verify(parcelas,times(5)).receber(anyLong(),anyDouble(),anyDouble(),anyDouble());
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     @Test
     public void testReceber_SucessoPassandoIfTipo() {
         // Dados de entrada
-    	Double valorRestante1 = 150.00;
-    	Double valorRestante2 = 51.00;
+    	Double valorRestante1 = 3.00;
+    	Double valorRestante2 = 3.00;
         Long codreceber = 1L;
-        Double vlrecebido = 200.0;
+        Double vlrecebido = 5.0;
         Double vlacrescimo = 0.0;
         Double vldesconto = 0.0;
         Long codtitulo = 1L;
@@ -455,7 +481,7 @@ public void testAbrirRecebimento_Success() {
         when(titulos.busca(codtitulo)).thenReturn(Optional.of(tituloMock));
         when(recebimento.getData_processamento()).thenReturn(null);
         when(recebimento.getValor_total()).thenReturn(1000.0);
-        when(recebimentoRepository.findById(codreceber)).thenReturn(Optional.of(recebimento));
+        when(recebimentos.findById(codreceber)).thenReturn(Optional.of(recebimento));
         doNothing().when(recebimento).setTitulo(tituloMock);
         when(receParcelas.parcelasDoReceber(codreceber)).thenReturn(listParcelaMock);
         when(parcela2Mock.getValor_restante()).thenReturn(valorRestante1);
@@ -473,6 +499,112 @@ public void testAbrirRecebimento_Success() {
        // });
         	
         assertEquals("Recebimento realizado com sucesso", resultado);
+        verify(cartaoLancamentos, times(1)).lancamento(anyDouble(),any());
+        verify(parcelas,times(2)).receber(anyLong(),anyDouble(),anyDouble(),anyDouble());
+    }
+    
+    @Test
+    public void testReceber_SucessoPassandoIfTipoUmaParceladeDuas() {
+        // Dados de entrada
+    	Double valorRestante1 = 3.00;
+    	Double valorRestante2 = 3.00;
+        Long codreceber = 1L;
+        Double vlrecebido = 5.0;
+        Double vlacrescimo = 0.0;
+        Double vldesconto = 0.0;
+        Long codtitulo = 1L;
+        List<Parcela> listParcelaMock =  new ArrayList<>();
+        listParcelaMock.add(parcela2Mock);
+        listParcelaMock.add(parcelaMock);
+        // Mocking do recebimento
+        Recebimento recebimento = mock(Recebimento.class);
+        when(titulos.busca(codtitulo)).thenReturn(Optional.of(tituloMock));
+        when(recebimento.getData_processamento()).thenReturn(null);
+        when(recebimento.getValor_total()).thenReturn(1000.0);
+        when(recebimentos.findById(codreceber)).thenReturn(Optional.of(recebimento));
+        doNothing().when(recebimento).setTitulo(tituloMock);
+        when(receParcelas.parcelasDoReceber(codreceber)).thenReturn(listParcelaMock);
+        when(parcela2Mock.getValor_restante()).thenReturn(valorRestante1);
+        when(parcelaMock.getValor_restante()).thenReturn(valorRestante2);
+        when(parcela2Mock.getCodigo()).thenReturn(5L);
+        when(parcelaMock.getCodigo()).thenReturn(10L);
+        when(parcelas.receber(anyLong(), anyDouble(), anyDouble(), anyDouble())).thenReturn("ok");
+        when(tituloMock.getTipo()).thenReturn(tituloTipoMock);
+        when(tituloTipoMock.getSigla()).thenReturn("CARTDEB");
+        when(caixas.caixaAberto()).thenReturn(Optional.of(caixaMock));
+        when(lancamentos.lancamento(any(CaixaLancamento.class))).thenReturn("ok");
+        // Execução do método
+        //RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        String resultado = recebimentoService.receber(codreceber, vlrecebido, vlacrescimo, vldesconto, codtitulo);
+       // });
+        	
+        assertEquals("Recebimento realizado com sucesso", resultado);
+        verify(cartaoLancamentos, times(1)).lancamento(anyDouble(),any());
+        verify(parcelas,times(2)).receber(anyLong(),anyDouble(),anyDouble(),anyDouble());
+        verify(parcela2Mock,times(1)).getValor_restante();
+        verify(parcelaMock,times(1)).getValor_restante();
+    }
+    @Test
+    public void testRemover_Sucesso() {
+        // Dados de entrada
+        Long codigoRecebimento = 1L;
+
+        // Mocking do recebimento
+        Recebimento recebimento = mock(Recebimento.class);
+        when(recebimento.getData_processamento()).thenReturn(null);
+        when(recebimentos.findById(codigoRecebimento)).thenReturn(Optional.of(recebimento));
+
+        // Execução do método
+        String resultado = recebimentoService.remover(codigoRecebimento);
+
+        // Verificação
+        assertEquals("removido com sucesso", resultado);
+        verify(recebimentos, times(1)).deleteById(codigoRecebimento);
+    }
+
+    @Test
+    public void testRemover_RecebimentoProcessado() {
+        // Dados de entrada
+        Long codigoRecebimento = 1L;
+
+        // Mocking de recebimento processado
+        Recebimento recebimento = mock(Recebimento.class);
+        when(recebimento.getData_processamento()).thenReturn(new Timestamp(System.currentTimeMillis()));
+        when(recebimentos.findById(codigoRecebimento)).thenReturn(Optional.of(recebimento));
+
+        // Execução do método e verificação da exceção
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            recebimentoService.remover(codigoRecebimento);
+        });
+
+        // Verificação da mensagem
+        assertEquals("Esse recebimento não pode ser removido, pois ele já esta processado", exception.getMessage());
+        verify(recebimentos, never()).deleteById(codigoRecebimento);
+    }
+
+ 
+
+    @Test
+    public void testRemover_ErroAoRemover() {
+        // Dados de entrada
+        Long codigoRecebimento = 1L;
+
+        // Mocking do recebimento
+        Recebimento recebimento = mock(Recebimento.class);
+        when(recebimento.getData_processamento()).thenReturn(null);
+        when(recebimentos.findById(codigoRecebimento)).thenReturn(Optional.of(recebimento));
+
+        // Simulação de erro ao remover
+        doThrow(new RuntimeException("Erro de banco de dados")).when(recebimentos).deleteById(codigoRecebimento);
+
+        // Execução do método e verificação da exceção
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            recebimentoService.remover(codigoRecebimento);
+        });
+
+        // Verificação da mensagem
+        assertEquals("Erro ao remover orçamento, chame o suporte", exception.getMessage());
+        verify(recebimentos, times(1)).deleteById(codigoRecebimento);
     }
 
 
