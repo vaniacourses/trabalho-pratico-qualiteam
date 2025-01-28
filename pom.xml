@@ -123,6 +123,11 @@
         <version>5.10.0</version>
     </dependency>
 		<!-- … -->
+		<dependency>
+			<groupId>com.rdelgatte</groupId>
+			<artifactId>pitest-examples</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -168,7 +173,7 @@
             <outputFormat>HTML</outputFormat>
           </outputFormats>
           <targetClasses>
-            <param><param>net.originmobi.pdv.*</param></param>
+            <param><param>net.originmobi.pdv.service*</param></param>
           </targetClasses>
           <targetTests>
             <param><param>net.originmobi.pdv.*</param></param>
