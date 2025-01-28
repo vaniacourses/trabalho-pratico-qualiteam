@@ -1,5 +1,5 @@
 package net.originmobi.pdv.enumerado;
 
-public enum TituloTipo {
+public enum TituloTipoEnum {
 	DIN, CARTDEB, CARTCRED;
 }

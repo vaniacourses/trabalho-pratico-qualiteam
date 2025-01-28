@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ibm.icu.text.DecimalFormat;
 
 import net.originmobi.pdv.controller.TituloService;
-import net.originmobi.pdv.enumerado.TituloTipo;
+import net.originmobi.pdv.enumerado.TituloTipoEnum;
 import net.originmobi.pdv.enumerado.caixa.EstiloLancamento;
 import net.originmobi.pdv.enumerado.caixa.TipoLancamento;
 import net.originmobi.pdv.model.Caixa;
@@ -163,7 +163,7 @@ public class RecebimentoService {
 		String sigla = titulo.map(Titulo::getTipo).get().getSigla();
 
 		// verifica se é um lançamento do tipo cartão para lançar o cartao_lancamento
-		if (sigla.equals(TituloTipo.CARTDEB.toString()) || sigla.equals(TituloTipo.CARTCRED.toString())) {
+		if (sigla.equals(TituloTipoEnum.CARTDEB.toString()) || sigla.equals(TituloTipoEnum.CARTCRED.toString())) {
 			cartaoLancamentos.lancamento(vllancamento, titulo);
 
 		} else {
