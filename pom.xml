@@ -107,6 +107,21 @@
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+		    <groupId>org.seleniumhq.selenium</groupId>
+		    <artifactId>selenium-java</artifactId>
+		</dependency>	
+	    <!-- WebDriver Manager -->
+	    <dependency>
+	        <groupId>io.github.bonigarcia</groupId>
+	        <artifactId>webdrivermanager</artifactId>
+	        <version>5.9.2</version> 
+	    </dependency>
+	    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>5.10.0</version>
+    </dependency>
 		<!-- … -->
 	</dependencies>
 
