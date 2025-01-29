@@ -141,12 +141,13 @@ public class RecebimentoService {
 
 				Double vlquitado = vlsobra - vlrecebido;
 				vlquitado = vlquitado < 0 ? vlquitado * -1 : vlquitado;
-
+				
 				vlrecebido = vlsobra;
 
 				Long parcela = listParcelas.get(i).getCodigo();
 
 				try {
+					
 					parcelas.receber(parcela, vlquitado, 0.00, 0.00);
 				} catch (Exception e) {
 					e.getMessage();

@@ -1,6 +1,7 @@
 package net.originmobi.pdv.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
@@ -25,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.stubbing.answers.DoesNothing;
 import org.springframework.security.core.Authentication;
@@ -108,7 +110,8 @@ public void testAbrirRecebimento_Success() {
     Parcela parcela1 = mock(Parcela.class);
     Parcela parcela2 = mock(Parcela.class);
     Pessoa pessoaParcela = mock(Pessoa.class);
-
+    Recebimento recebimentoSpy = Mockito.spy(new Recebimento());
+    
     when(parcela1.getQuitado()).thenReturn(0);
     when(parcela1.getCodigo()).thenReturn(1L);
     when(parcela1.getValor_restante()).thenReturn(100.0);
@@ -122,7 +125,7 @@ public void testAbrirRecebimento_Success() {
     when(parcela2.getReceber().getPessoa()).thenReturn(pessoaParcela);
 
     when(pessoaParcela.getCodigo()).thenReturn(codpes);
-
+    
     when(parcelas.busca(1L)).thenReturn(parcela1);
     when(parcelas.busca(2L)).thenReturn(parcela2);
 
@@ -145,6 +148,8 @@ public void testAbrirRecebimento_Success() {
     // Verificações
     assertNotNull(codigoRecebimento);
     assertEquals("1", codigoRecebimento);
+
+    assertNotNull(recebimentoSpy);
     verify(parcelas, times(2)).busca(anyLong());
     verify(recebimentos, times(1)).save(any(Recebimento.class));
 }
@@ -402,7 +407,8 @@ public void testAbrirRecebimento_Success() {
     	Parcela parcelaMock4 = mock(Parcela.class);
     	Parcela parcelaMock5 = mock(Parcela.class);
     	
-    	Double valorRestante = 1.00;
+    	
+    	Double valorRestante = 2.00;
         Long codreceber = 1L;
         Double vlrecebido = 5.0;
         Double vlacrescimo = 0.0;
@@ -428,11 +434,11 @@ public void testAbrirRecebimento_Success() {
         when(parcelaMock3.getValor_restante()).thenReturn(valorRestante);
         when(parcelaMock4.getValor_restante()).thenReturn(valorRestante);
         when(parcelaMock5.getValor_restante()).thenReturn(valorRestante);
-        when(parcela2Mock.getCodigo()).thenReturn(1L);
-        when(parcela2Mock.getCodigo()).thenReturn(2L);
-        when(parcela2Mock.getCodigo()).thenReturn(3L);
-        when(parcela2Mock.getCodigo()).thenReturn(4L);
-        when(parcela2Mock.getCodigo()).thenReturn(5L);
+        when(parcelaMock1.getCodigo()).thenReturn(1L);
+        when(parcelaMock2.getCodigo()).thenReturn(2L);
+        when(parcelaMock3.getCodigo()).thenReturn(3L);
+        when(parcelaMock4.getCodigo()).thenReturn(4L);
+        when(parcelaMock5.getCodigo()).thenReturn(5L);
         when(parcelas.receber(eq(1L), anyDouble(), anyDouble(), anyDouble())).thenReturn("ok");
         when(parcelas.receber(eq(2L), anyDouble(), anyDouble(), anyDouble())).thenReturn("ok");
         when(parcelas.receber(eq(3L), anyDouble(), anyDouble(), anyDouble())).thenReturn("ok");
@@ -449,7 +455,19 @@ public void testAbrirRecebimento_Success() {
         	
         assertEquals("Recebimento realizado com sucesso", resultado);
         verify(cartaoLancamentos, times(1)).lancamento(anyDouble(),any());
-        verify(parcelas,times(5)).receber(anyLong(),anyDouble(),anyDouble(),anyDouble());
+        verify(parcelas,times(3)).receber(anyLong(),or(eq(2.0),eq(1.0)),eq(0.00),eq(0.00));
+        verify(parcelaMock1,times(1)).getValor_restante();
+        verify(parcelaMock2,times(1)).getValor_restante();
+        verify(parcelaMock3,times(1)).getValor_restante();
+        //verify(parcelaMock4,times(1)).getValor_restante();
+        //verify(parcelaMock5,times(1)).getValor_restante();
+        verify(parcelaMock1,times(1)).getCodigo();
+        verify(parcelaMock2,times(1)).getCodigo();
+        verify(parcelaMock3,times(1)).getCodigo();
+        //verify(parcelaMock4,times(1)).getCodigo();
+        //verify(parcelaMock5,times(1)).getCodigo();
+
+    
     }
     
     
@@ -543,7 +561,60 @@ public void testAbrirRecebimento_Success() {
         verify(parcelas,times(2)).receber(anyLong(),anyDouble(),anyDouble(),anyDouble());
         verify(parcela2Mock,times(1)).getValor_restante();
         verify(parcelaMock,times(1)).getValor_restante();
+        verify(recebimento,times(1)).setValor_recebido(vlrecebido);
+        verify(recebimento,times(1)).setValor_acrescimo(vlacrescimo);
+        verify(recebimento,times(1)).setValor_desconto(vldesconto);
+        verify(recebimento,times(1)).setData_processamento(any(Timestamp.class));
+        verify(recebimentos,times(1)).save(recebimento);
     }
+    @Test
+    public void testReceber_VlsobraPositiva() {
+        // Dados de entrada
+        Long codreceber = 1L;
+        Double vlrecebido = 200.0;
+        Double vlacrescimo = 0.0;
+        Double vldesconto = 0.0;
+        Long codtitulo = 1L;
+
+        // Mocking do recebimento
+        Recebimento recebimento = mock(Recebimento.class);
+        when(titulos.busca(codtitulo)).thenReturn(Optional.of(tituloMock));
+        when(recebimentos.findById(codreceber)).thenReturn(Optional.of(recebimento));
+        when(recebimento.getData_processamento()).thenReturn(null);
+        when(recebimento.getValor_total()).thenReturn(200.0);
+        doNothing().when(recebimento).setTitulo(tituloMock);
+
+        // Mocking das parcelas
+        Parcela parcela = mock(Parcela.class);
+        when(parcela.getValor_restante()).thenReturn(150.0); // valor_restante = 150.0
+        when(parcela.getCodigo()).thenReturn(1L);
+
+        List<Parcela> listParcelaMock = new ArrayList<>();
+        listParcelaMock.add(parcela);
+
+        when(receParcelas.parcelasDoReceber(codreceber)).thenReturn(listParcelaMock);
+
+        // Simular a chamada de receber na parcela com vlquitado = 150.0
+        when(parcelas.receber(eq(1L), eq(150.0), eq(0.0), eq(0.0))).thenReturn("ok");
+
+        when(tituloMock.getTipo()).thenReturn(tituloTipoMock);
+        when(tituloTipoMock.getSigla()).thenReturn("DIN"); // Não é CARTDEB nem CARTCRED
+        when(caixas.caixaAberto()).thenReturn(Optional.of(caixaMock));
+
+        // Simular o lançamento no caixa
+        when(lancamentos.lancamento(any(CaixaLancamento.class))).thenReturn("ok");
+
+        // Execução do método
+        String resultado = recebimentoService.receber(codreceber, vlrecebido, vlacrescimo, vldesconto, codtitulo);
+
+        // Verificações
+        assertEquals("Recebimento realizado com sucesso", resultado);
+        verify(parcelas, times(1)).receber(eq(1L), eq(150.0), eq(0.0), eq(0.0));
+        verify(recebimento, times(1)).setTitulo(tituloMock);
+        verify(recebimentos, times(1)).save(recebimento);
+        verify(lancamentos, times(1)).lancamento(any(CaixaLancamento.class));
+    }
+    
     @Test
     public void testRemover_Sucesso() {
         // Dados de entrada
