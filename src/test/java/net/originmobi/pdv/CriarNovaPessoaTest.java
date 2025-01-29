@@ -28,7 +28,7 @@ public class CriarNovaPessoaTest {
     }
 
     @BeforeEach
-    public void createDriver() throws InterruptedException {
+    void createDriver() {
         
         driver = WebDriverManager.chromedriver().create();
         wait = new WebDriverWait(driver, 20);
@@ -43,7 +43,7 @@ public class CriarNovaPessoaTest {
     }
 
     @Test
-    public void CadastrarPessoa() throws InterruptedException {
+    void CadastrarPessoa()  {
         WebElement link = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div[3]/div/div[8]/a")));
         link.click();
         WebElement novaPessoa = driver.findElement(By.xpath("//*[@id=\"btn-padrao\"]/a"));
