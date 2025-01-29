@@ -203,9 +203,8 @@ public class VendaService {
 
 			// venda à vista
 			if (formaPagar[i].equals("00")) {
-
-				// no dinheiro
-				if (titulo.get().getTipo().getSigla().equals(TituloTipoEnum.DIN.toString())) {
+				
+				if (titulo.isPresent() && titulo.get().getTipo().getSigla().equals(TituloTipoEnum.DIN.toString())) {
 					// verifica se o caixa esta aberto para realizar o lançamento no mesmo
 					if (!caixas.caixaIsAberto())
 						throw new RuntimeException("nenhum caixa aberto");
@@ -214,8 +213,8 @@ public class VendaService {
 				}
 
 				// se for no cartão de debito ou crédito
-				else if (titulo.get().getTipo().getSigla().equals(TituloTipoEnum.CARTDEB.toString())
-						|| titulo.get().getTipo().getSigla().equals(TituloTipoEnum.CARTCRED.toString())) {
+				else if (titulo.isPresent() && (titulo.get().getTipo().getSigla().equals(TituloTipoEnum.CARTDEB.toString())
+						|| titulo.get().getTipo().getSigla().equals(TituloTipoEnum.CARTCRED.toString()))) {
 
 					Double vl_parcela = Double.valueOf(vlParcelas[i]);
 
